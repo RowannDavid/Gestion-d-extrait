@@ -1,0 +1,131 @@
+grails:
+    profile: rest-api # Changé de 'web' à 'rest-api' pour une API pure
+    codegen:
+        defaultPackage: gestion.extrait.api
+    gorm:
+        reactor:
+            events: false
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+spring:
+    jmx:
+        unique-names: true
+    main:
+        banner-mode: "off"
+    groovy:
+        template:
+            check-template-location: false
+    devtools:
+        restart:
+            additional-exclude:
+                - '*.gsp'
+                - '**/*.gsp'
+                - '*.gson'
+                - '**/*.gson'
+                - 'logback-spring.xml'
+                - '*.properties'
+
+---
+grails:
+    cors:
+        enabled: true
+        allowedOrigins:
+            - "http://localhost:5173"
+            - "http://localhost:3000"
+            - "http://127.0.0.1:5173"
+            - "http://127.0.0.1:3000"
+        allowedMethods:
+            - GET
+            - POST
+            - PUT
+            - DELETE
+            - OPTIONS
+        allowedHeaders:
+            - Content-Type
+            - Authorization
+            - Accept
+    mime:
+        disable:
+            accept:
+                header:
+                    userAgents:
+                        - Gecko
+                        - WebKit
+                        - Presto
+                        - Trident
+        types:
+            json:
+                - application/json
+                - text/json
+            hal:
+                - application/hal+json
+                - application/hal+xml
+            xml:
+                - text/xml
+                - application/xml
+    urlmapping:
+        cache:
+            maxsize: 1000
+    controllers:
+        defaultScope: singleton
+    converters:
+        encoding: UTF-8
+    views:
+        # Pour une API, on privilégie souvent JSON views (.gson)
+        json:
+            generator:
+                compact: true
+---
+
+hibernate:
+    cache:
+        queries: false
+        use_second_level_cache: false
+        use_query_cache: false
+    hbm2ddl:
+        auto: update
+dataSource:
+    pooled: true
+    jmxExport: true
+    driverClassName: org.postgresql.Driver
+    dialect: org.hibernate.dialect.PostgreSQLDialect
+    username: postgres
+    password: 12345678
+
+environments:
+
+    development:
+        dataSource:
+            dbCreate: update
+            url: jdbc:postgresql://localhost:5432/extrait_naissance
+
+    test:
+        dataSource:
+            dbCreate: update
+            url: jdbc:postgresql://localhost:5432/extrait_naissance_test
+
+    production:
+        dataSource:
+            dbCreate: none
+            url: jdbc:postgresql://localhost:5432/extrait_naissance
+            properties:
+                jmxEnabled: true
+                initialSize: 5
+                maxActive: 50
+                minIdle: 5
+                maxIdle: 25
+                maxWait: 10000
+                maxAge: 600000
+                timeBetweenEvictionRunsMillis: 5000
+                minEvictableIdleTimeMillis: 60000
+                validationQuery: SELECT 1
+                validationQueryTimeout: 3
+                validationInterval: 15000
+                testOnBorrow: true
+                testWhileIdle: true
+                testOnReturn: false
+                jdbcInterceptors: ConnectionState
+                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED

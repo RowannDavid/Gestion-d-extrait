@@ -1,0 +1,82 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center"
+     style="background: linear-gradient(135deg, #1a3c5e 0%, #2d6a9f 100%)">
+
+  <div class="card shadow-lg border-0" style="width: 420px; border-radius: 16px;">
+
+    <!-- En-tête -->
+    <div class="card-header text-white text-center py-4 border-0"
+         style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f); border-radius: 16px 16px 0 0;">
+      <i class="bi bi-file-earmark-text fs-1"></i>
+      <h4 class="mt-2 mb-0 fw-bold">Gestion Extraits</h4>
+      <p class="mb-0 opacity-75 small">Mairie de Cocody</p>
+    </div>
+
+    <div class="card-body p-4">
+      <h5 class="text-center mb-4 fw-semibold text-secondary">Connexion</h5>
+
+      <!-- Erreur -->
+      <div *ngIf="erreur" class="alert alert-danger d-flex align-items-center" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ erreur }}
+      </div>
+
+      <!-- Formulaire -->
+      <form (ngSubmit)="onLogin()">
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-envelope me-1"></i> Email
+          </label>
+          <input
+            type="email"
+            class="form-control form-control-lg"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="votre@email.com"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-lock me-1"></i> Mot de passe
+          </label>
+          <input
+            type="password"
+            class="form-control form-control-lg"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg w-100 fw-semibold"
+          [disabled]="chargement"
+          style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f); border: none;">
+          <span *ngIf="chargement">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Connexion...
+          </span>
+          <span *ngIf="!chargement">
+            <i class="bi bi-box-arrow-in-right me-2"></i>
+            Se connecter
+          </span>
+        </button>
+
+      </form>
+
+      <hr class="my-4">
+
+      <p class="text-center mb-0 text-muted">
+        Pas encore de compte ?
+        <a routerLink="/register" class="text-primary fw-semibold text-decoration-none">
+          S'inscrire
+        </a>
+      </p>
+    </div>
+
+  </div>
+</div>

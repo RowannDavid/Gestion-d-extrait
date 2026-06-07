@@ -1,0 +1,188 @@
+<!-- Navbar -->
+<nav class="navbar navbar-dark shadow-sm"
+     style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f)">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/dashboard">
+      <i class="bi bi-file-earmark-text me-2"></i> Gestion Extraits
+    </a>
+    <a routerLink="/demandes" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Retour
+    </a>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <!-- Chargement -->
+      <div *ngIf="chargement" class="text-center py-5">
+        <div class="spinner-border text-primary" style="width:3rem;height:3rem;"></div>
+        <p class="mt-3 text-muted">Chargement...</p>
+      </div>
+
+      <!-- Erreur -->
+      <div *ngIf="erreur" class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i> {{ erreur }}
+      </div>
+
+      <!-- Succès -->
+      <div *ngIf="succes" class="alert alert-success">
+        <i class="bi bi-check-circle me-2"></i> {{ succes }}
+      </div>
+
+      <div *ngIf="!chargement && demande">
+
+        <!-- En-tête carte -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+          <div class="card-body p-4">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <h5 class="fw-bold mb-1">{{ demande.nom }} {{ demande.prenoms }}</h5>
+                <p class="text-muted mb-0">
+                  <i class="bi bi-tag me-1"></i>
+                  {{ demande.reference }}
+                </p>
+              </div>
+              <span class="badge fs-6 {{ getBadgeClass(demande.statut) }}">
+                {{ demande.statut }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Infos personnelles -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+          <div class="card-header bg-white border-0 pt-3 pb-0">
+            <h6 class="fw-bold">
+              <i class="bi bi-person text-primary me-2"></i>
+              Informations personnelles
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="text-muted small">Nom complet</label>
+                <p class="fw-semibold mb-0">{{ demande.nom }} {{ demande.prenoms }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Genre</label>
+                <p class="fw-semibold mb-0">{{ demande.genre }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Date de naissance</label>
+                <p class="fw-semibold mb-0">{{ demande.dateNaissance }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Ville de naissance</label>
+                <p class="fw-semibold mb-0">{{ demande.villeNaissance }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Téléphone</label>
+                <p class="fw-semibold mb-0">{{ demande.telephone || 'Non renseigné' }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Nom du parent</label>
+                <p class="fw-semibold mb-0">{{ demande.nomParent }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Infos demande -->
+        <div class="card border-0 shadow-sm mb-4" style="border-radius: 12px;">
+          <div class="card-header bg-white border-0 pt-3 pb-0">
+            <h6 class="fw-bold">
+              <i class="bi bi-file-text text-primary me-2"></i>
+              Informations de la demande
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="text-muted small">Type d'extrait</label>
+                <p class="fw-semibold mb-0">{{ demande.typeExtrait }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Lieu de livraison</label>
+                <p class="fw-semibold mb-0">{{ demande.lieuLivraison }}</p>
+              </div>
+              <div class="col-md-6">
+                <label class="text-muted small">Statut</label>
+                <p class="mb-0">
+                  <span class="badge {{ getBadgeClass(demande.statut) }}">
+                    {{ demande.statut }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+          <div class="card-body p-4">
+            <h6 class="fw-bold mb-3">
+              <i class="bi bi-lightning text-primary me-2"></i>
+              Actions
+            </h6>
+
+            <div class="d-flex flex-wrap gap-3">
+
+              <!-- Modifier si BROUILLON -->
+              <a *ngIf="demande.statut === 'BROUILLON'"
+                 [routerLink]="['/demandes', demande.id, 'modifier']"
+                 class="btn btn-outline-primary">
+                <i class="bi bi-pencil me-2"></i> Modifier
+              </a>
+
+              <!-- Soumettre si BROUILLON -->
+              <button *ngIf="demande.statut === 'BROUILLON'"
+                      class="btn btn-warning"
+                      (click)="soumettre()"
+                      [disabled]="chargementSoumettre">
+                <span *ngIf="chargementSoumettre">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                </span>
+                <span *ngIf="!chargementSoumettre">
+                  <i class="bi bi-send me-2"></i>
+                </span>
+                Soumettre
+              </button>
+
+              <!-- Message en traitement -->
+              <div *ngIf="demande.statut === 'EN_TRAITEMENT'"
+                   class="alert alert-warning mb-0 py-2 px-3">
+                <i class="bi bi-hourglass-split me-2"></i>
+                Votre demande est en cours de traitement
+              </div>
+
+              <!-- Télécharger si ACCEPTE -->
+              <button *ngIf="demande.statut === 'ACCEPTE'"
+                      class="btn btn-success"
+                      (click)="telecharger()"
+                      [disabled]="chargementTelecharger">
+                <span *ngIf="chargementTelecharger">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                </span>
+                <span *ngIf="!chargementTelecharger">
+                  <i class="bi bi-download me-2"></i>
+                </span>
+                Télécharger mon extrait PDF
+              </button>
+
+              <!-- Message refusé -->
+              <div *ngIf="demande.statut === 'REFUSE'"
+                   class="alert alert-danger mb-0 py-2 px-3">
+                <i class="bi bi-x-circle me-2"></i>
+                Votre demande a été refusée
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>

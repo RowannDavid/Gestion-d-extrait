@@ -1,0 +1,110 @@
+<div class="min-vh-100 d-flex align-items-center justify-content-center"
+     style="background: linear-gradient(135deg, #1a3c5e 0%, #2d6a9f 100%)">
+
+  <div class="card shadow-lg border-0" style="width: 480px; border-radius: 16px;">
+
+    <!-- En-tête -->
+    <div class="card-header text-white text-center py-4 border-0"
+         style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f); border-radius: 16px 16px 0 0;">
+      <i class="bi bi-person-plus fs-1"></i>
+      <h4 class="mt-2 mb-0 fw-bold">Créer un compte</h4>
+      <p class="mb-0 opacity-75 small">Mairie de Cocody</p>
+    </div>
+
+    <div class="card-body p-4">
+
+      <!-- Succès -->
+      <div *ngIf="succes" class="alert alert-success d-flex align-items-center">
+        <i class="bi bi-check-circle me-2"></i> {{ succes }}
+      </div>
+
+      <!-- Erreur -->
+      <div *ngIf="erreur" class="alert alert-danger d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle me-2"></i> {{ erreur }}
+      </div>
+
+      <form (ngSubmit)="onRegister()">
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">
+              <i class="bi bi-person me-1"></i> Nom
+            </label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="nom"
+              name="nom"
+              placeholder="Kouassi"
+              required
+            />
+          </div>
+          <div class="col-md-6 mb-3">
+            <label class="form-label fw-semibold">Prénoms</label>
+            <input
+              type="text"
+              class="form-control"
+              [(ngModel)]="prenoms"
+              name="prenoms"
+              placeholder="Jean"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-envelope me-1"></i> Email
+          </label>
+          <input
+            type="email"
+            class="form-control"
+            [(ngModel)]="email"
+            name="email"
+            placeholder="votre@email.com"
+            required
+          />
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label fw-semibold">
+            <i class="bi bi-lock me-1"></i> Mot de passe
+          </label>
+          <input
+            type="password"
+            class="form-control"
+            [(ngModel)]="password"
+            name="password"
+            placeholder="••••••••"
+            required
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="btn btn-primary btn-lg w-100 fw-semibold"
+          [disabled]="chargement"
+          style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f); border: none;">
+          <span *ngIf="chargement">
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Inscription...
+          </span>
+          <span *ngIf="!chargement">
+            <i class="bi bi-person-check me-2"></i>
+            S'inscrire
+          </span>
+        </button>
+
+      </form>
+
+      <hr class="my-3">
+
+      <p class="text-center mb-0 text-muted">
+        Déjà un compte ?
+        <a routerLink="/login" class="text-primary fw-semibold text-decoration-none">
+          Se connecter
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+<!-- Navbar -->
+<nav class="navbar navbar-dark shadow-sm"
+     style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f)">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">
+      <i class="bi bi-shield-check me-2"></i> Admin - Gestion Extraits
+    </a>
+    <div class="d-flex gap-2">
+      <a routerLink="/admin/demandes" class="btn btn-outline-light btn-sm">
+        <i class="bi bi-list me-1"></i> Demandes
+      </a>
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">
+        <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+
+  <div class="mb-4">
+    <h4 class="fw-bold">Tableau de bord Admin</h4>
+    <p class="text-muted">Gestion des demandes d'extraits</p>
+  </div>
+
+  <!-- Stats -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px;">
+        <div class="fs-2 fw-bold text-primary">{{ total }}</div>
+        <div class="text-muted small">Total</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px;">
+        <div class="fs-2 fw-bold text-warning">{{ enTraitement }}</div>
+        <div class="text-muted small">En traitement</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px;">
+        <div class="fs-2 fw-bold text-success">{{ accepte }}</div>
+        <div class="text-muted small">Acceptées</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3" style="border-radius:12px;">
+        <div class="fs-2 fw-bold text-danger">{{ refuse }}</div>
+        <div class="text-muted small">Refusées</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demandes récentes 
+  <div class="card border-0 shadow-sm" style="border-radius:12px;">
+    <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center pt-3">
+      <h6 class="fw-bold mb-0">
+        <i class="bi bi-clock-history text-primary me-2"></i>
+        Demandes récentes
+      </h6>
+      <a routerLink="/admin/demandes" class="btn btn-primary btn-sm">
+        Voir tout
+      </a>
+    </div>
+    <div class="card-body">
+
+      <div *ngIf="chargement" class="text-center py-4">
+        <div class="spinner-border text-primary"></div>
+      </div>
+
+      <div class="table-responsive" *ngIf="!chargement">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Référence</th>
+              <th>Nom</th>
+              <th>Type</th>
+              <th>Statut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of demandes.slice(0,5)">
+              <td><span class="badge bg-light text-dark border">{{ d.reference }}</span></td>
+              <td>{{ d.nom }} {{ d.prenoms }}</td>
+              <td>{{ d.typeExtrait }}</td>
+              <td>
+                <span class="badge {{ getBadgeClass(d.statut) }}">{{ d.statut }}</span>
+              </td>
+              <td>
+                <a [routerLink]="['/admin/demandes']"
+                   class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-eye"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+-->
+</div>

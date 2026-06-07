@@ -36,12 +36,12 @@ class AdminController {
         render(demandes.collect {[
                 id:            it.id,
                 reference:     it.reference,
-                statut:        it.statut,
+                statut:        it.statut?.toString(),
                 nom:           it.nom,
                 prenoms:       it.prenoms,
-                typeExtrait:   it.typeExtrait,
+                typeExtrait:   it.typeExtrait?.toString(),
                 dateNaissance: formatDate(it.dateNaissance),
-                utilisateur:   [
+                utilisateur: [
                         id:      it.utilisateur?.id,
                         nom:     it.utilisateur?.nom,
                         prenoms: it.utilisateur?.prenoms,
@@ -70,15 +70,15 @@ class AdminController {
         render([
                 id:             demande.id,
                 reference:      demande.reference,
-                statut:         demande.statut,
+                statut:         demande.statut?.toString(),
                 nom:            demande.nom,
                 prenoms:        demande.prenoms,
-                genre:          demande.genre,
+                genre:          demande.genre?.toString(),
                 dateNaissance:  formatDate(demande.dateNaissance),
                 villeNaissance: demande.villeNaissance,
                 telephone:      demande.telephone,
                 nomParent:      demande.nomParent,
-                typeExtrait:    demande.typeExtrait,
+                typeExtrait:    demande.typeExtrait?.toString(),
                 lieuLivraison:  demande.lieuLivraison,
                 dateCreated:    formatDate(demande.dateCreated),
                 utilisateur: [
@@ -107,10 +107,10 @@ class AdminController {
             render(demandes.collect {[
                     id:          it.id,
                     reference:   it.reference,
-                    statut:      it.statut,
+                    statut:      it.statut?.toString(),
                     nom:         it.nom,
                     prenoms:     it.prenoms,
-                    typeExtrait: it.typeExtrait,
+                    typeExtrait: it.typeExtrait?.toString(),
                     dateCreated: formatDate(it.dateCreated),
                     utilisateur: [
                             nom:     it.utilisateur?.nom,
@@ -139,7 +139,7 @@ class AdminController {
                 message:   "Demande acceptée avec succès",
                 id:        demande.id,
                 reference: demande.reference,
-                statut:    demande.statut
+                statut:    demande.statut?.toString()
         ] as JSON)
     }
 
@@ -158,7 +158,7 @@ class AdminController {
                 message:   "Demande refusée",
                 id:        demande.id,
                 reference: demande.reference,
-                statut:    demande.statut
+                statut:    demande.statut?.toString()
         ] as JSON)
     }
 

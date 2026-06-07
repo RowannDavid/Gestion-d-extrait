@@ -44,11 +44,11 @@ class AuthService {
                 success: true,
                 token: token,
                 user: [
-                        id: user.id,
-                        nom: user.nom,
+                        id:      user.id,
+                        nom:     user.nom,
                         prenoms: user.prenoms,
-                        email: user.email,
-                        role: user.role
+                        email:   user.email,
+                        role:    user.role.toString()  // ✅ Forcer String
                 ]
         ]
     }

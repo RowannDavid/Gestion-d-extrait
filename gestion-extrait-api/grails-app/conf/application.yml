@@ -1,5 +1,5 @@
 grails:
-    profile: rest-api # Changé de 'web' à 'rest-api' pour une API pure
+    profile: web
     codegen:
         defaultPackage: gestion.extrait.api
     gorm:
@@ -11,6 +11,12 @@ info:
         version: '@info.app.version@'
         grailsVersion: '@info.app.grailsVersion@'
 spring:
+    security:
+        enabled: false
+    autoconfigure:
+        exclude:
+            - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+            - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
     jmx:
         unique-names: true
     main:
@@ -30,42 +36,31 @@ spring:
 
 ---
 grails:
+    profile: web
+    codegen:
+        defaultPackage: gestion.extrait.api
     cors:
         enabled: true
         allowedOrigins:
-            - "http://localhost:5173"
-            - "http://localhost:3000"
-            - "http://127.0.0.1:5173"
-            - "http://127.0.0.1:3000"
+            - 'http://localhost:4200'
+            - '*'
         allowedMethods:
             - GET
             - POST
             - PUT
             - DELETE
             - OPTIONS
+            - HEAD
         allowedHeaders:
-            - Content-Type
             - Authorization
+            - Content-Type
             - Accept
-    mime:
-        disable:
-            accept:
-                header:
-                    userAgents:
-                        - Gecko
-                        - WebKit
-                        - Presto
-                        - Trident
-        types:
-            json:
-                - application/json
-                - text/json
-            hal:
-                - application/hal+json
-                - application/hal+xml
-            xml:
-                - text/xml
-                - application/xml
+            - Origin
+            - X-Requested-With
+        exposedHeaders:
+            - Authorization
+        maxAge: 3600
+        allowCredentials: false
     urlmapping:
         cache:
             maxsize: 1000

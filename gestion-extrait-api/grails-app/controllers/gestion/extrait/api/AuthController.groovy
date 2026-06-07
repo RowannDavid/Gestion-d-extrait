@@ -19,10 +19,14 @@ class AuthController {
 
         if (result.success) {
             response.status = 201
-            render([message: result.message] as JSON)
+            render([
+                    message: result.message
+            ] as JSON)
         } else {
             response.status = 400
-            render([message: result.message] as JSON)
+            render([
+                    message: result.message
+            ] as JSON)
         }
     }
 
@@ -38,11 +42,19 @@ class AuthController {
             response.status = 200
             render([
                     token: result.token,
-                    user:  result.user
+                    user: [
+                            id:       result.user.id,
+                            nom:      result.user.nom,
+                            prenoms:  result.user.prenoms,
+                            email:    result.user.email,
+                            role:     result.user.role?.toString()
+                    ]
             ] as JSON)
         } else {
             response.status = 401
-            render([message: result.message] as JSON)
+            render([
+                    message: result.message
+            ] as JSON)
         }
     }
 }

@@ -1,0 +1,145 @@
+<!-- Navbar -->
+<nav class="navbar navbar-dark shadow-sm"
+     style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f)">
+  <div class="container">
+    <a class="navbar-brand fw-bold" routerLink="/dashboard">
+      <i class="bi bi-file-earmark-text me-2"></i> Gestion Extraits
+    </a>
+    <a routerLink="/demandes" class="btn btn-outline-light btn-sm">
+      <i class="bi bi-arrow-left me-1"></i> Retour
+    </a>
+  </div>
+</nav>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+
+      <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+        <div class="card-header bg-white border-0 pt-4 pb-0">
+          <h5 class="fw-bold mb-0">
+            <i class="bi bi-plus-circle text-primary me-2"></i>
+            Nouvelle demande d'extrait
+          </h5>
+          <p class="text-muted small mt-1">Remplissez tous les champs obligatoires</p>
+        </div>
+
+        <div class="card-body p-4">
+
+          <!-- Succès -->
+          <div *ngIf="succes" class="alert alert-success">
+            <i class="bi bi-check-circle me-2"></i> {{ succes }}
+          </div>
+
+          <!-- Erreur -->
+          <div *ngIf="erreur" class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle me-2"></i> {{ erreur }}
+          </div>
+
+          <form (ngSubmit)="onSubmit()">
+
+            <!-- Infos personnelles -->
+            <h6 class="fw-bold text-muted mb-3 mt-2">
+              <i class="bi bi-person me-1"></i> Informations personnelles
+            </h6>
+
+            <div class="row g-3 mb-4">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Nom *</label>
+                <input type="text" class="form-control"
+                       [(ngModel)]="demande.nom" name="nom"
+                       placeholder="Kouassi" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Prénoms *</label>
+                <input type="text" class="form-control"
+                       [(ngModel)]="demande.prenoms" name="prenoms"
+                       placeholder="Jean" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Genre *</label>
+                <select class="form-select"
+                        [(ngModel)]="demande.genre" name="genre" required>
+                  <option value="">-- Choisir --</option>
+                  <option value="MASCULIN">Masculin</option>
+                  <option value="FEMININ">Féminin</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Date de naissance *</label>
+                <input type="date" class="form-control"
+                       [(ngModel)]="demande.dateNaissance"
+                       name="dateNaissance" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Ville de naissance *</label>
+                <input type="text" class="form-control"
+                       [(ngModel)]="demande.villeNaissance"
+                       name="villeNaissance" placeholder="Abidjan" required/>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Téléphone</label>
+                <input type="tel" class="form-control"
+                       [(ngModel)]="demande.telephone"
+                       name="telephone" placeholder="0701020304"/>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">Nom du parent *</label>
+                <input type="text" class="form-control"
+                       [(ngModel)]="demande.nomParent"
+                       name="nomParent" placeholder="Nom et prénom du père ou de la mère" required/>
+              </div>
+            </div>
+
+            <!-- Infos demande -->
+            <h6 class="fw-bold text-muted mb-3">
+              <i class="bi bi-file-text me-1"></i> Informations de la demande
+            </h6>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Type d'extrait *</label>
+                <select class="form-select"
+                        [(ngModel)]="demande.typeExtrait"
+                        name="typeExtrait" required>
+                  <option value="">-- Choisir --</option>
+                  <option value="NAISSANCE">Naissance</option>
+                  <option value="MARIAGE">Mariage</option>
+                  <option value="DECES">Décès</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">Lieu de livraison *</label>
+                <input type="text" class="form-control"
+                       [(ngModel)]="demande.lieuLivraison"
+                       name="lieuLivraison"
+                       placeholder="Mairie Cocody" required/>
+              </div>
+            </div>
+
+            <!-- Boutons -->
+            <div class="d-flex gap-3 mt-4">
+              <a routerLink="/demandes"
+                 class="btn btn-outline-secondary flex-fill">
+                <i class="bi bi-x me-1"></i> Annuler
+              </a>
+              <button type="submit"
+                      class="btn btn-primary flex-fill"
+                      [disabled]="chargement"
+                      style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f); border:none;">
+                <span *ngIf="chargement">
+                  <span class="spinner-border spinner-border-sm me-2"></span>
+                  Création...
+                </span>
+                <span *ngIf="!chargement">
+                  <i class="bi bi-send me-2"></i> Créer la demande
+                </span>
+              </button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

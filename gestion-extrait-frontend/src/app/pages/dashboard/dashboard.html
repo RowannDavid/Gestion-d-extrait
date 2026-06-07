@@ -1,0 +1,173 @@
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark shadow-sm"
+     style="background: linear-gradient(135deg, #1a3c5e, #2d6a9f)">
+  <div class="container">
+    <a class="navbar-brand fw-bold" href="#">
+      <i class="bi bi-file-earmark-text me-2"></i>
+      Gestion Extraits
+    </a>
+    <div class="navbar-nav ms-auto d-flex flex-row align-items-center gap-3">
+      <span class="text-white">
+        <i class="bi bi-person-circle me-1"></i>
+        {{ user?.nom }} {{ user?.prenoms }}
+      </span>
+      <button class="btn btn-outline-light btn-sm" (click)="logout()">
+        <i class="bi bi-box-arrow-right me-1"></i> Déconnexion
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-4">
+
+  <!-- Bienvenue -->
+  <div class="mb-4">
+    <h4 class="fw-bold text-dark">
+      Bonjour, {{ user?.prenoms }} 👋
+    </h4>
+    <p class="text-muted">Gérez vos demandes d'extraits de naissance</p>
+  </div>
+
+  <!-- Statistiques -->
+  <div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3"
+           style="border-radius: 12px; border-left: 4px solid #2d6a9f !important;">
+        <div class="fs-2 fw-bold text-primary">{{ total }}</div>
+        <div class="text-muted small">Total</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3"
+           style="border-radius: 12px; border-left: 4px solid #6c757d !important;">
+        <div class="fs-2 fw-bold text-secondary">{{ brouillon }}</div>
+        <div class="text-muted small">Brouillon</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3"
+           style="border-radius: 12px; border-left: 4px solid #ffc107 !important;">
+        <div class="fs-2 fw-bold text-warning">{{ enTraitement }}</div>
+        <div class="text-muted small">En traitement</div>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-3">
+      <div class="card border-0 shadow-sm text-center p-3"
+           style="border-radius: 12px; border-left: 4px solid #198754 !important;">
+        <div class="fs-2 fw-bold text-success">{{ accepte }}</div>
+        <div class="text-muted small">Acceptées</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="row g-3 mb-4">
+    <div class="col-md-6">
+      <a routerLink="/demandes/new"
+         class="card border-0 shadow-sm text-decoration-none p-4 d-flex flex-row align-items-center gap-3"
+         style="border-radius: 12px; cursor: pointer;">
+        <div class="rounded-circle d-flex align-items-center justify-content-center"
+             style="width:50px; height:50px; background: #e8f0fe;">
+          <i class="bi bi-plus-circle text-primary fs-4"></i>
+        </div>
+        <div>
+          <div class="fw-bold text-dark">Nouvelle demande</div>
+          <div class="text-muted small">Créer une demande d'extrait</div>
+        </div>
+      </a>
+    </div>
+    <div class="col-md-6">
+      <a routerLink="/demandes"
+         class="card border-0 shadow-sm text-decoration-none p-4 d-flex flex-row align-items-center gap-3"
+         style="border-radius: 12px; cursor: pointer;">
+        <div class="rounded-circle d-flex align-items-center justify-content-center"
+             style="width:50px; height:50px; background: #e8f4ea;">
+          <i class="bi bi-list-ul text-success fs-4"></i>
+        </div>
+        <div>
+          <div class="fw-bold text-dark">Mes demandes</div>
+          <div class="text-muted small">Voir toutes mes demandes</div>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Dernières demandes -->
+  <div class="card border-0 shadow-sm" style="border-radius: 12px;">
+    <div class="card-header bg-white border-0 pt-3 pb-0">
+      <h6 class="fw-bold mb-0">
+        <i class="bi bi-clock-history me-2 text-primary"></i>
+        Dernières demandes
+      </h6>
+    </div>
+    <div class="card-body">
+
+      <!-- Chargement -->
+      <div *ngIf="chargement" class="text-center py-4">
+        <div class="spinner-border text-primary"></div>
+        <p class="mt-2 text-muted">Chargement...</p>
+      </div>
+
+      <!-- Aucune demande -->
+      <div *ngIf="!chargement && demandes.length === 0" class="text-center py-4">
+        <i class="bi bi-inbox fs-1 text-muted"></i>
+        <p class="text-muted mt-2">Aucune demande pour l'instant</p>
+        <a routerLink="/demandes/new" class="btn btn-primary btn-sm">
+          <i class="bi bi-plus me-1"></i> Créer une demande
+        </a>
+      </div>
+
+      <!-- Liste -->
+      <div *ngIf="!chargement && demandes.length > 0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Référence</th>
+                <th>Nom</th>
+                <th>Type</th>
+                <th>Statut</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let d of demandes.slice(0, 5)">
+                <td>
+                  <span class="badge bg-light text-dark border">
+                    {{ d.reference }}
+                  </span>
+                </td>
+                <td>{{ d.nom }} {{ d.prenoms }}</td>
+                <td>{{ d.typeExtrait }}</td>
+                <td>
+                  <span class="badge {{ getBadgeClass(d.statut) }}">
+                    {{ d.statut }}
+                  </span>
+                </td>
+                <td>
+                  <a [routerLink]="['/demandes', d.id]"
+                     class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="text-center mt-3" *ngIf="demandes.length > 5">
+          <a routerLink="/demandes" class="btn btn-outline-primary btn-sm">
+            Voir toutes les demandes ({{ demandes.length }})
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>

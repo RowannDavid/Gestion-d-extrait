@@ -4,6 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../core/services/admin';
 import { AuthService } from '../../../core/services/auth';
+import th from '@angular/common/locales/th';
 
 @Component({
   selector: 'app-demandes',
@@ -102,15 +103,25 @@ export class Demandes implements OnInit {
 
   genererPdf(id: number) {
     this.chargementPdf = id;
+    this.succes = '';
+    this.erreur = '';
+
     this.adminService.genererPdf(id).subscribe({
-      next: () => {
+      next: (data) => {
         this.succes = 'PDF généré avec succès !';
         this.chargementPdf = null;
-        setTimeout(() => this.succes = '', 3000);
+        this.cdr.detectChanges();
+        window.scrollTo({top: 0, behavior: 'smooth'});
+        setTimeout(() => {
+          this.succes = '';
+          this.cdr.detectChanges();
+        }, 6000);
       },
-      error: () => {
-        this.erreur = 'Erreur génération PDF';
+      error: (err) => {
         this.chargementPdf = null;
+      this.erreur = err.error?.message || 'Erreur lors de la génération du PDF';
+      this.cdr.detectChanges();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
   }

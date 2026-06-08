@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth';
 import { DemandeService } from '../../core/services/demande';
-import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard',
@@ -17,7 +16,6 @@ export class Dashboard implements OnInit {
   demandes: any[] = [];
   chargement = true;
 
-  // Statistiques
   total = 0;
   brouillon = 0;
   enTraitement = 0;
@@ -27,28 +25,33 @@ export class Dashboard implements OnInit {
   constructor(
     private authService: AuthService,
     private demandeService: DemandeService,
-    private router: Router
+    private router: Router,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
     this.user = this.authService.getUser();
     this.chargerDemandes();
   }
-  
+
   chargerDemandes() {
+    this.chargement = true;
     this.demandeService.mesDemandes().subscribe({
       next: (data) => {
-        console.log('Demandes reçues:', data);
-        this.demandes = data;
-        this.total = data.length;
+        console.log('Demandes dashboard:', data);
+        this.demandes = [...data];
+        this.total        = data.length;
+        this.brouillon    = data.filter(d => d.statut === 'BROUILLON').length;
         this.enTraitement = data.filter(d => d.statut === 'EN_TRAITEMENT').length;
-        this.accepte = data.filter(d => d.statut === 'ACCEPTE').length;
-        this.refuse = data.filter(d => d.statut === 'REFUSE').length;
-        this.chargement = false;
+        this.accepte      = data.filter(d => d.statut === 'ACCEPTE').length;
+        this.refuse       = data.filter(d => d.statut === 'REFUSE').length;
+        this.chargement   = false;
+        this.cdr.detectChanges();
       },
       error: (err) => {
-        console.log('Erreur:', err); 
+        console.log('Erreur dashboard:', err);
         this.chargement = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -67,5 +70,14 @@ export class Dashboard implements OnInit {
       default:              return 'bg-secondary';
     }
   }
-  
+
+  getStatutIcon(statut: string): string {
+    switch(statut) {
+      case 'BROUILLON':     return 'bi-pencil';
+      case 'EN_TRAITEMENT': return 'bi-hourglass-split';
+      case 'ACCEPTE':       return 'bi-check-circle';
+      case 'REFUSE':        return 'bi-x-circle';
+      default:              return 'bi-circle';
+    }
+  }
 }

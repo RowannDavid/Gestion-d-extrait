@@ -37,11 +37,18 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+  path: 'demandes/:id/modifier',
+  loadComponent: () =>
+    import('./pages/demandes/modifier/modifier').then(m => m.Modifier),
+  canActivate: [authGuard]
+  },
+  {
     path: 'demandes/:id',
     loadComponent: () =>
       import('./pages/demandes/detail/detail').then(m => m.Detail),
     canActivate: [authGuard]
   },
+  
 
   // Pages ADMIN
   {

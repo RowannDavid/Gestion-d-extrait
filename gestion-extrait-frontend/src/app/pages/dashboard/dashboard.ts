@@ -34,14 +34,13 @@ export class Dashboard implements OnInit {
     this.user = this.authService.getUser();
     this.chargerDemandes();
   }
-
+  
   chargerDemandes() {
     this.demandeService.mesDemandes().subscribe({
       next: (data) => {
         console.log('Demandes reçues:', data);
         this.demandes = data;
         this.total = data.length;
-        this.brouillon = data.filter(d => d.statut === 'BROUILLON').length;
         this.enTraitement = data.filter(d => d.statut === 'EN_TRAITEMENT').length;
         this.accepte = data.filter(d => d.statut === 'ACCEPTE').length;
         this.refuse = data.filter(d => d.statut === 'REFUSE').length;

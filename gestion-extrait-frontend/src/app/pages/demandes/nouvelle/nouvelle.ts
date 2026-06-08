@@ -32,21 +32,25 @@ export class Nouvelle {
     private demandeService: DemandeService,
     private router: Router
   ) {}
+onSubmit() {
+  this.erreur = '';
+  this.chargement = true;
 
-  onSubmit() {
-    this.erreur = '';
-    this.chargement = true;
+  // ✅ Log pour voir ce qu'on envoie
+  console.log('Données envoyées:', this.demande);
 
-    this.demandeService.creer(this.demande).subscribe({
-      next: (data) => {
-        this.chargement = false;
-        this.succes = `Demande créée ! Référence : ${data.reference}`;
-        setTimeout(() => this.router.navigate(['/demandes']), 2000);
-      },
-      error: (err) => {
-        this.chargement = false;
-        this.erreur = err.error?.message || 'Erreur lors de la création';
-      }
-    });
-  }
+  this.demandeService.creer(this.demande).subscribe({
+    next: (data) => {
+      console.log('Réponse:', data);
+      this.chargement = false;
+      this.succes = `Demande créée ! Référence : ${data.reference}`;
+      setTimeout(() => this.router.navigate(['/demandes']), 2000);
+    },
+    error: (err) => {
+      console.log('Erreur:', err);
+      this.chargement = false;
+      this.erreur = err.error?.message || 'Erreur lors de la création';
+    }
+  });
+}
 }

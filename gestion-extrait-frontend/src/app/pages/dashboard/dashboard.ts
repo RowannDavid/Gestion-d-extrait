@@ -38,7 +38,7 @@ export class Dashboard implements OnInit {
   chargerDemandes() {
     this.demandeService.mesDemandes().subscribe({
       next: (data) => {
-        console.log('Demandes reçues:', data);  // ✅ Debug
+        console.log('Demandes reçues:', data);
         this.demandes = data;
         this.total = data.length;
         this.brouillon = data.filter(d => d.statut === 'BROUILLON').length;
@@ -48,7 +48,7 @@ export class Dashboard implements OnInit {
         this.chargement = false;
       },
       error: (err) => {
-        console.log('Erreur:', err);  // ✅ Debug
+        console.log('Erreur:', err); 
         this.chargement = false;
       }
     });
@@ -68,4 +68,5 @@ export class Dashboard implements OnInit {
       default:              return 'bg-secondary';
     }
   }
+  
 }

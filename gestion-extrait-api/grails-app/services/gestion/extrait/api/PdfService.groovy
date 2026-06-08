@@ -2,131 +2,244 @@ package gestion.extrait.api
 
 import com.itextpdf.text.*
 import com.itextpdf.text.pdf.*
-import com.itextpdf.text.pdf.draw.LineSeparator  // ✅ Import manquant
+import com.itextpdf.text.pdf.draw.LineSeparator
 import grails.gorm.transactions.Transactional
 import java.text.SimpleDateFormat
 
 @Transactional
 class PdfService {
 
+    def grailsApplication
+
     String genererExtrait(Demande demande) {
 
-        // Dossier de sauvegarde
-        String dossier = "extraits"
+        String dossierConfig = grailsApplication.config.getProperty('app.extraits.dossier', 'extraits')
+        String dossier = System.getProperty("user.dir") + File.separator + dossierConfig
         new File(dossier).mkdirs()
 
         String nomFichier = "extrait_${demande.reference}_${System.currentTimeMillis()}.pdf"
-        String cheminFichier = "${dossier}/${nomFichier}"
+        String cheminFichier = dossier + File.separator + nomFichier
 
-        Document document = new Document(PageSize.A4)
-        PdfWriter.getInstance(document, new FileOutputStream(cheminFichier))
+        Document document = new Document(PageSize.A4, 40, 40, 40, 40)
+        PdfWriter writer = PdfWriter.getInstance(document, new FileOutputStream(cheminFichier))
         document.open()
 
         // ===== POLICES =====
-        Font fontTitre     = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD)
-        Font fontSousTitre = new Font(Font.FontFamily.HELVETICA, 13, Font.BOLD)
-        Font fontLabel     = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD)
-        Font fontValeur    = new Font(Font.FontFamily.HELVETICA, 11, Font.NORMAL)
-        Font fontPetit     = new Font(Font.FontFamily.HELVETICA, 9,  Font.ITALIC)
+        Font fontTitre      = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD)
+        Font fontSousTitre  = new Font(Font.FontFamily.HELVETICA, 11, Font.BOLD)
+        Font fontNormal     = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL)
+        Font fontBold       = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD)
+        Font fontPetit      = new Font(Font.FontFamily.HELVETICA, 8,  Font.NORMAL)
+        Font fontPetitBold  = new Font(Font.FontFamily.HELVETICA, 8,  Font.BOLD)
+        Font fontGrand      = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD)
 
-        // ===== EN-TÊTE =====
-        Paragraph entete = new Paragraph()
-        entete.alignment = Element.ALIGN_CENTER
-        entete.add(new Phrase("REPUBLIQUE DE CÔTE D'IVOIRE\n", fontSousTitre))
-        entete.add(new Phrase("Union - Discipline - Travail\n\n", fontPetit))
-        entete.add(new Phrase("MAIRIE DE COCODY\n", fontSousTitre))
-        entete.add(new Phrase("Service de l'État Civil\n\n", fontValeur))
-        document.add(entete)
+        // ===== EN-TÊTE - 3 colonnes =====
+        PdfPTable headerTable = new PdfPTable(3)
+        headerTable.widthPercentage = 100
+        headerTable.setWidths([1f, 1.5f, 1f] as float[])
+        headerTable.spacingAfter = 5
+
+        // Colonne gauche
+        PdfPCell cellGauche = new PdfPCell()
+        cellGauche.border = Rectangle.NO_BORDER
+        cellGauche.addElement(new Paragraph("REPUBLIQUE DE\nCÔTE D'IVOIRE", fontPetitBold))
+        cellGauche.addElement(new Paragraph("Union - Discipline\nTravail", fontPetit))
+        headerTable.addCell(cellGauche)
+
+        // Colonne centre
+        PdfPCell cellCentre = new PdfPCell()
+        cellCentre.border = Rectangle.NO_BORDER
+        cellCentre.horizontalAlignment = Element.ALIGN_CENTER
+        cellCentre.addElement(new Paragraph("DISTRICT AUTONOME\nD'ABIDJAN", fontPetitBold) {{ alignment = Element.ALIGN_CENTER }})
+        cellCentre.addElement(new Paragraph("VILLE D'ABIDJAN", fontPetitBold) {{ alignment = Element.ALIGN_CENTER }})
+        cellCentre.addElement(new Paragraph("COMMUNE DE COCODY", fontSousTitre) {{ alignment = Element.ALIGN_CENTER }})
+        cellCentre.addElement(new Paragraph("SOUS-PREFECTURE\nDE COCODY", fontPetit) {{ alignment = Element.ALIGN_CENTER }})
+        cellCentre.addElement(new Paragraph("ETAT CIVIL", fontSousTitre) {{ alignment = Element.ALIGN_CENTER }})
+        headerTable.addCell(cellCentre)
+
+        // Colonne droite
+        PdfPCell cellDroite = new PdfPCell()
+        cellDroite.border = Rectangle.NO_BORDER
+        cellDroite.horizontalAlignment = Element.ALIGN_RIGHT
+        cellDroite.addElement(new Paragraph(
+                "Abidjan, le ${new SimpleDateFormat('dd/MM/yyyy').format(new Date())}",
+                fontPetit) {{ alignment = Element.ALIGN_RIGHT }})
+        headerTable.addCell(cellDroite)
+
+        document.add(headerTable)
 
         // Ligne séparatrice
-        LineSeparator separator = new LineSeparator()
-        document.add(new Chunk(separator))
+        LineSeparator sep = new LineSeparator(2f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)
+        document.add(new Chunk(sep))
         document.add(Chunk.NEWLINE)
 
-        // ===== TITRE =====
-        Paragraph titre = new Paragraph("EXTRAIT D'ACTE DE NAISSANCE", fontTitre)
-        titre.alignment = Element.ALIGN_CENTER
-        titre.spacingAfter = 20
-        document.add(titre)
+        // ===== TITRE PRINCIPAL =====
+        Paragraph titrePrincipal = new Paragraph("EXTRAIT", fontGrand)
+        titrePrincipal.alignment = Element.ALIGN_CENTER
+        titrePrincipal.spacingBefore = 5
+        titrePrincipal.spacingAfter = 2
+        document.add(titrePrincipal)
 
-        // ===== RÉFÉRENCE =====
-        Paragraph ref = new Paragraph()
-        ref.alignment = Element.ALIGN_CENTER
-        ref.add(new Phrase("Référence : ", fontLabel))
-        ref.add(new Phrase(demande.reference, fontValeur))
-        ref.spacingAfter = 20
-        document.add(ref)
+        Paragraph sousTitrePrincipal = new Paragraph(
+                "De la Registre des Actes de Naissance\nde l'Année : ${new SimpleDateFormat('yyyy').format(demande.dateNaissance ?: new Date())}",
+                fontNormal)
+        sousTitrePrincipal.alignment = Element.ALIGN_CENTER
+        sousTitrePrincipal.spacingAfter = 10
+        document.add(sousTitrePrincipal)
 
-        // ===== INFOS PERSONNE =====
-        document.add(new Paragraph("INFORMATIONS DU DEMANDEUR", fontSousTitre))
+        document.add(new Chunk(new LineSeparator(1f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)))
         document.add(Chunk.NEWLINE)
 
-        // Tableau des infos
-        PdfPTable table = new PdfPTable(2)
-        table.widthPercentage = 100
-        table.setWidths([1f, 2f] as float[])
-        table.spacingAfter = 20
+        // ===== NUMÉRO ACTE =====
+        PdfPTable numTable = new PdfPTable(2)
+        numTable.widthPercentage = 100
+        numTable.setWidths([1f, 2f] as float[])
+        numTable.spacingAfter = 10
 
-        ajouterLigne(table, "Nom :",           demande.nom,           fontLabel, fontValeur)
-        ajouterLigne(table, "Prénoms :",        demande.prenoms,       fontLabel, fontValeur)
-        ajouterLigne(table, "Genre :",          demande.genre?.toString(), fontLabel, fontValeur)
-        ajouterLigne(table, "Date de naissance :",
-                demande.dateNaissance ? new SimpleDateFormat("dd/MM/yyyy").format(demande.dateNaissance) : "",
-                fontLabel, fontValeur)
-        ajouterLigne(table, "Lieu de naissance :", demande.villeNaissance, fontLabel, fontValeur)
-        ajouterLigne(table, "Nom du parent :",  demande.nomParent,     fontLabel, fontValeur)
-        document.add(table)
+        ajouterCellule(numTable, "N° de l'Acte :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(numTable, demande.reference ?: "________", fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
 
-        // ===== INFOS DEMANDE =====
-        document.add(new Paragraph("INFORMATIONS DE LA DEMANDE", fontSousTitre))
+        ajouterCellule(numTable, "Nombre de :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(numTable, "UN", fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+        document.add(numTable)
+
+        // ===== SECTION NAISSANCE =====
+        Paragraph sectionNaissance = new Paragraph("NAISSANCE", fontSousTitre)
+        sectionNaissance.spacingBefore = 5
+        sectionNaissance.spacingAfter = 8
+        document.add(sectionNaissance)
+
+        // Infos naissance
+        PdfPTable naissTable = new PdfPTable(4)
+        naissTable.widthPercentage = 100
+        naissTable.setWidths([0.8f, 1.5f, 0.8f, 1.5f] as float[])
+        naissTable.spacingAfter = 10
+
+        // Ligne 1
+        ajouterCellule(naissTable, "Nom :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(naissTable, (demande.nom ?: "").toUpperCase(), fontBold, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+        ajouterCellule(naissTable, "Prénom(s) :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(naissTable, demande.prenoms ?: "", fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+
+        // Ligne 2
+        ajouterCellule(naissTable, "Sexe :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(naissTable, demande.genre?.toString() == 'MASCULIN' ? 'Masculin' : 'Féminin', fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+        ajouterCellule(naissTable, "Née le :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(naissTable,
+                demande.dateNaissance ? new SimpleDateFormat("dd MMMM yyyy", Locale.FRENCH).format(demande.dateNaissance) : "",
+                fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+
+        // Ligne 3
+        ajouterCellule(naissTable, "À :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(naissTable, demande.villeNaissance ?: "", fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+        ajouterCellule(naissTable, "Tél :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(naissTable, demande.telephone ?: "", fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+
+        document.add(naissTable)
+
+        // ===== SECTION PARENTS =====
+        Paragraph sectionParents = new Paragraph("FILIATION", fontSousTitre)
+        sectionParents.spacingBefore = 5
+        sectionParents.spacingAfter = 8
+        document.add(sectionParents)
+
+        PdfPTable parentsTable = new PdfPTable(4)
+        parentsTable.widthPercentage = 100
+        parentsTable.setWidths([0.8f, 1.5f, 0.8f, 1.5f] as float[])
+        parentsTable.spacingAfter = 15
+
+        ajouterCellule(parentsTable, "Père/Mère :", fontBold, Element.ALIGN_LEFT, Rectangle.NO_BORDER)
+        ajouterCellule(parentsTable, demande.nomParent ?: "", fontNormal, Element.ALIGN_LEFT, Rectangle.BOTTOM)
+        document.add(parentsTable)
+
+        // ===== MENTIONS =====
+        document.add(new Chunk(new LineSeparator(1f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)))
         document.add(Chunk.NEWLINE)
 
-        PdfPTable table2 = new PdfPTable(2)
-        table2.widthPercentage = 100
-        table2.setWidths([1f, 2f] as float[])
-        table2.spacingAfter = 30
+        Paragraph mentions = new Paragraph("MENTIONS MARGINALES", fontSousTitre)
+        mentions.spacingAfter = 30
+        document.add(mentions)
 
-        ajouterLigne(table2, "Type d'extrait :",  demande.typeExtrait?.toString(), fontLabel, fontValeur)
-        ajouterLigne(table2, "Lieu de livraison :", demande.lieuLivraison,         fontLabel, fontValeur)
-        ajouterLigne(table2, "Statut :",           demande.statut?.toString(),     fontLabel, fontValeur)
-        ajouterLigne(table2, "Date de demande :",
-                demande.dateCreated ? new SimpleDateFormat("dd/MM/yyyy").format(demande.dateCreated) : "",
-                fontLabel, fontValeur)
-        document.add(table2)
+        document.add(new Chunk(new LineSeparator(1f, 100f, BaseColor.GRAY, Element.ALIGN_CENTER, -2)))
+        document.add(Chunk.NEWLINE)
+        document.add(new Chunk(new LineSeparator(1f, 100f, BaseColor.GRAY, Element.ALIGN_CENTER, -2)))
+        document.add(Chunk.NEWLINE)
 
         // ===== SIGNATURE =====
-        document.add(new Chunk(separator))
-        document.add(Chunk.NEWLINE)
+        PdfPTable signTable = new PdfPTable(2)
+        signTable.widthPercentage = 100
+        signTable.setWidths([1f, 1f] as float[])
+        signTable.spacingBefore = 20
 
-        Paragraph signature = new Paragraph()
-        signature.alignment = Element.ALIGN_RIGHT
-        signature.add(new Phrase("Abidjan, le ${new SimpleDateFormat('dd/MM/yyyy').format(new Date())}\n\n", fontValeur))
-        signature.add(new Phrase("L'Officier de l'État Civil\n\n\n\n", fontLabel))
-        signature.add(new Phrase("_______________________", fontValeur))
-        document.add(signature)
+        // Colonne gauche - Demandeur
+        PdfPCell cellDemandeur = new PdfPCell()
+        cellDemandeur.border = Rectangle.NO_BORDER
+        cellDemandeur.addElement(new Paragraph("Le Demandeur", fontBold))
+        cellDemandeur.addElement(new Paragraph("\n\n\n", fontNormal))
+        cellDemandeur.addElement(new Paragraph("_____________________", fontNormal))
+        cellDemandeur.addElement(new Paragraph("${demande.nom} ${demande.prenoms}", fontNormal))
+        signTable.addCell(cellDemandeur)
+
+        // Colonne droite - Officier
+        PdfPCell cellOfficier = new PdfPCell()
+        cellOfficier.border = Rectangle.NO_BORDER
+        cellOfficier.horizontalAlignment = Element.ALIGN_RIGHT
+        cellOfficier.addElement(new Paragraph(
+                "Abidjan, le ${new SimpleDateFormat('dd MMMM yyyy', Locale.FRENCH).format(new Date())}",
+                fontNormal) {{ alignment = Element.ALIGN_RIGHT }})
+        cellOfficier.addElement(new Paragraph(
+                "L'Officier de l'État Civil",
+                fontBold) {{ alignment = Element.ALIGN_RIGHT }})
+        cellOfficier.addElement(new Paragraph("\n\n\n", fontNormal))
+        cellOfficier.addElement(new Paragraph(
+                "_____________________",
+                fontNormal) {{ alignment = Element.ALIGN_RIGHT }})
+        signTable.addCell(cellOfficier)
+
+        document.add(signTable)
 
         // ===== PIED DE PAGE =====
-        Paragraph pied = new Paragraph()
+        document.add(Chunk.NEWLINE)
+        document.add(new Chunk(new LineSeparator(1f, 100f, BaseColor.BLACK, Element.ALIGN_CENTER, -2)))
+
+        Paragraph pied = new Paragraph(
+                "Référence : ${demande.reference} | Généré le ${new SimpleDateFormat('dd/MM/yyyy HH:mm').format(new Date())}",
+                fontPetit)
         pied.alignment = Element.ALIGN_CENTER
-        pied.spacingBefore = 30
-        pied.add(new Phrase("Document généré le ${new SimpleDateFormat('dd/MM/yyyy HH:mm').format(new Date())}\n", fontPetit))
-        pied.add(new Phrase("Ce document est officiel et certifié par la Mairie de Cocody", fontPetit))
+        pied.spacingBefore = 5
         document.add(pied)
 
         document.close()
 
-        // ===== Sauvegarder en base =====
-        Extrait extrait = new Extrait(
-                nomFichier:    nomFichier,
-                cheminFichier: cheminFichier,
-                demande:       demande
-        )
-        extrait.save(flush: true)
+        // Sauvegarder en base
+        Extrait existant = Extrait.findByDemande(demande)
+        if (existant) {
+            existant.nomFichier = nomFichier
+            existant.cheminFichier = cheminFichier
+            existant.save(flush: true)
+        } else {
+            new Extrait(
+                    nomFichier:    nomFichier,
+                    cheminFichier: cheminFichier,
+                    demande:       demande
+            ).save(flush: true)
+        }
 
         return cheminFichier
     }
 
-    private void ajouterLigne(PdfPTable table, String label, String valeur, Font fontLabel, Font fontValeur) {
+    private void ajouterCellule(PdfPTable table, String texte, Font font,
+                                int alignement, int bordure) {
+        PdfPCell cell = new PdfPCell(new Phrase(texte ?: "", font))
+        cell.border = bordure
+        cell.horizontalAlignment = alignement
+        cell.paddingBottom = 5
+        cell.paddingTop = 3
+        table.addCell(cell)
+    }
+
+    private void ajouterLigne(PdfPTable table, String label, String valeur,
+                              Font fontLabel, Font fontValeur) {
         PdfPCell cellLabel = new PdfPCell(new Phrase(label, fontLabel))
         cellLabel.border = Rectangle.NO_BORDER
         cellLabel.paddingBottom = 8

@@ -24,7 +24,7 @@ export class AuthService {
 
         const user = response.user;
 
-        // ✅ Normaliser le rôle (String ou Objet)
+        // Normaliser le rôle (String ou Objet)
         if (user && typeof user.role === 'object') {
           user.role = user.role?.name || user.role?.toString() || 'USER';
         }
@@ -40,8 +40,8 @@ export class AuthService {
 
   isAdmin(): boolean {
     const user = this.getUser();
-    console.log('User en storage:', user);        // ✅ Debug
-    console.log('Role:', user?.role);             // ✅ Debug
+    console.log('User en storage:', user);      
+    console.log('Role:', user?.role);           
     return user?.role === 'ADMIN';
   }
 

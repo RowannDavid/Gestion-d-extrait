@@ -32,9 +32,9 @@ export class Liste implements OnInit {
     this.demandeService.mesDemandes().subscribe({
       next: (data) => {
         console.log('DATA:', data);
-        this.demandes = [...data]; // ✅ Force la détection de changement
+        this.demandes = [...data];
         this.chargement = false;
-        this.cdr.detectChanges(); // ✅ Force le rendu
+        this.cdr.detectChanges();
         console.log('chargement:', this.chargement);
         console.log('demandes:', this.demandes.length);
       },
@@ -42,7 +42,7 @@ export class Liste implements OnInit {
         console.log('ERREUR:', err);
         this.erreur = 'Erreur lors du chargement';
         this.chargement = false;
-        this.cdr.detectChanges(); // ✅ Force le rendu
+        this.cdr.detectChanges();
       }
     });
   }

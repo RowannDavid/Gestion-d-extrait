@@ -22,12 +22,12 @@ export class Detail implements OnInit {
     private demandeService: DemandeService,
     private route: ActivatedRoute,
     private router: Router,
-    private cdr: ChangeDetectorRef  // ✅
+    private cdr: ChangeDetectorRef  
   ) {}
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
-    console.log('ID demande:', id); // ✅ Debug
+    console.log('ID demande:', id);
     if (id) {
       this.chargerDemande(+id);
     }
@@ -36,10 +36,10 @@ export class Detail implements OnInit {
   chargerDemande(id: number) {
     this.demandeService.detail(id).subscribe({
       next: (data) => {
-        console.log('Détail reçu:', data); // ✅ Debug
+        console.log('Détail reçu:', data); 
         this.demande = data;
         this.chargement = false;
-        this.cdr.detectChanges(); // ✅
+        this.cdr.detectChanges(); 
       },
       error: (err) => {
         console.log('Erreur détail:', err);

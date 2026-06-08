@@ -16,9 +16,9 @@ class BootStrap {
                         role: RoleUser.ADMIN
                 )
                 if (admin.save(flush: true)) {
-                    println "✅ Administrateur créé avec succès"
+                    println "Administrateur créé avec succès"
                 } else {
-                    println "❌ Erreur : ${admin.errors}"
+                    println "Erreur : ${admin.errors}"
                 }
             } else {
                 println "ℹ️ Administrateur déjà existant"

@@ -52,15 +52,21 @@ export class Demandes implements OnInit {
   }
 
   filtrer() {
-    if (this.filtreStatut === 'TOUS') {
-      this.demandesFiltrees = [...this.demandes];
-    } else {
-      this.demandesFiltrees = this.demandes.filter(
-        d => d.statut === this.filtreStatut
-      );
-    }
-    this.cdr.detectChanges(); // ✅
+  console.log('demandes:', this.demandes);
+  console.log('filtre:', this.filtreStatut);
+
+  if (this.filtreStatut === 'TOUS') {
+    this.demandesFiltrees = [...this.demandes];
+  } else {
+    this.demandesFiltrees = this.demandes.filter(
+      d => d.statut === this.filtreStatut
+    );
   }
+
+  console.log('demandesFiltrees:', this.demandesFiltrees);
+
+  this.cdr.detectChanges();
+}
 
   accepter(id: number) {
     this.chargementAction = id;

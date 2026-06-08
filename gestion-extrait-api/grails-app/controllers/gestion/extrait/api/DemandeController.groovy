@@ -187,38 +187,52 @@ class DemandeController {
         ] as JSON)
     }
 
-    // GET /api/admin/demandes/{id}/telecharger
+    // GET /api/demandes/{id}/telecharger - USER télécharge son extrait
     def telecharger(Long id) {
-        User admin = checkAdmin()
+        // ✅ Utilise utilisateurConnecte() au lieu de checkAdmin()
+        User user = SecurityHelper.utilisateurConnecte(request)
 
-        if (!admin) {
-            response.status = 403
-            render([message: "Accès réservé aux administrateurs"] as JSON)
+        if (!user) {
+            response.status = 401
+            render([message: "Non autorisé"] as JSON)
             return
         }
 
-        Extrait extrait = Extrait.findByDemande(Demande.get(id))
+        // Vérifier que la demande appartient à l'utilisateur
+        Demande demande = demandeService.trouverParId(id, user)
+        if (!demande) {
+            response.status = 404
+            render([message: "Demande introuvable"] as JSON)
+            return
+        }
 
+        // Vérifier que la demande est ACCEPTEE
+        if (demande.statut != StatutDemande.ACCEPTE) {
+            response.status = 400
+            render([message: "Votre demande n'est pas encore acceptée. Statut actuel : ${demande.statut}"] as JSON)
+            return
+        }
+
+        // Chercher l'extrait PDF
+        Extrait extrait = Extrait.findByDemande(demande)
         if (!extrait) {
             response.status = 404
-            render([message: "PDF non trouvé, générez-le d'abord"] as JSON)
+            render([message: "Extrait non disponible, contactez l'administration"] as JSON)
             return
         }
 
         File fichier = new File(extrait.cheminFichier)
-
         if (!fichier.exists()) {
             response.status = 404
             render([message: "Fichier introuvable sur le serveur"] as JSON)
             return
         }
 
+        // ✅ Téléchargement
         response.contentType = "application/pdf"
-        response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=${extrait.nomFichier}"
-        )
-
+        response.setHeader("Access-Control-Allow-Origin", "http://localhost:4200")
+        response.setHeader("Access-Control-Expose-Headers", "Content-Disposition")
+        response.setHeader("Content-Disposition", "attachment; filename=${extrait.nomFichier}")
         response.outputStream << fichier.bytes
         response.outputStream.flush()
     }

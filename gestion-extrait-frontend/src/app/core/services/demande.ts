@@ -21,7 +21,7 @@ export class DemandeService {
   mesDemandes(): Observable<any[]> {
   return this.http.get<any>(`${this.apiUrl}`).pipe(
     map((response: any) => {
-      console.log('Response demandes:', response); // ✅ Debug
+      console.log('Response demandes:', response); 
       // Si c'est déjà un tableau
       if (Array.isArray(response)) return response;
       // Si c'est un objet avec une propriété

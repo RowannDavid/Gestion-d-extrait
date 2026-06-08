@@ -1,3 +1,4 @@
+---
 grails:
     profile: web
     codegen:
@@ -5,45 +6,10 @@ grails:
     gorm:
         reactor:
             events: false
-info:
-    app:
-        name: '@info.app.name@'
-        version: '@info.app.version@'
-        grailsVersion: '@info.app.grailsVersion@'
-spring:
-    security:
-        enabled: false
-    autoconfigure:
-        exclude:
-            - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
-            - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
-    jmx:
-        unique-names: true
-    main:
-        banner-mode: "off"
-    groovy:
-        template:
-            check-template-location: false
-    devtools:
-        restart:
-            additional-exclude:
-                - '*.gsp'
-                - '**/*.gsp'
-                - '*.gson'
-                - '**/*.gson'
-                - 'logback-spring.xml'
-                - '*.properties'
-
----
-grails:
-    profile: web
-    codegen:
-        defaultPackage: gestion.extrait.api
     cors:
         enabled: true
         allowedOrigins:
             - 'http://localhost:4200'
-            - '*'
         allowedMethods:
             - GET
             - POST
@@ -68,13 +34,56 @@ grails:
         defaultScope: singleton
     converters:
         encoding: UTF-8
-    views:
-        # Pour une API, on privilégie souvent JSON views (.gson)
-        json:
-            generator:
-                compact: true
----
 
+app:
+    extraits:
+        dossier: extraits
+
+info:
+    app:
+        name: '@info.app.name@'
+        version: '@info.app.version@'
+        grailsVersion: '@info.app.grailsVersion@'
+
+spring:
+    security:
+        enabled: false
+    autoconfigure:
+        exclude:
+            - org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+            - org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration
+    jmx:
+        unique-names: true
+    main:
+        banner-mode: "off"
+    groovy:
+        template:
+            check-template-location: false
+    devtools:
+        restart:
+            additional-exclude:
+                - '*.gsp'
+                - '**/*.gsp'
+                - '*.gson'
+                - '**/*.gson'
+                - 'logback-spring.xml'
+                - '*.properties'
+
+environments:
+    development:
+        management:
+            endpoints:
+                enabled-by-default: true
+                web:
+                    base-path: '/actuator'
+                    exposure:
+                        include: '*'
+    production:
+        management:
+            endpoints:
+                enabled-by-default: false
+
+---
 hibernate:
     cache:
         queries: false
@@ -82,6 +91,7 @@ hibernate:
         use_query_cache: false
     hbm2ddl:
         auto: update
+
 dataSource:
     pooled: true
     jmxExport: true
@@ -91,7 +101,6 @@ dataSource:
     password: 12345678
 
 environments:
-
     development:
         dataSource:
             dbCreate: update
@@ -123,4 +132,4 @@ environments:
                 testWhileIdle: true
                 testOnReturn: false
                 jdbcInterceptors: ConnectionState
-                defaultTransactionIsolation: 2 # TRANSACTION_READ_COMMITTED
+                defaultTransactionIsolation: 2
